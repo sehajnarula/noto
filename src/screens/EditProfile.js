@@ -6,8 +6,8 @@ import {useIsFocused} from "@react-navigation/native";
 import StoreInternalData from "../context/StoreInternalData";
 import {AuthContext} from "../context/AuthContext";
 import {collection,getDocs} from "firebase/firestore";
-import {doc,setDoc,updateDoc} from 'firebase/firestore';
-import {auth,firestore} from '../../firebaseconfig';
+import {doc,updateDoc} from 'firebase/firestore';
+import {firestore} from '../../firebaseconfig';
 import ChangeImageIcon from "../../assets/images/editprofilepencil.svg";
 import Toast from "react-native-toast-message";
 import * as progress from 'react-native-progress';
@@ -71,7 +71,9 @@ const EditProfile = () =>{
                     visibilityTime: 3000,
                   });
                   setProgressLoading(false);
-              }).catch((error)=>{
+                  setUserFullName(userFullName);
+                  setUserEmailAddress(userEmailAddress);
+                }).catch((error)=>{
                 Toast.show({
                     type:'error',
                     text1: 'Unable to update',

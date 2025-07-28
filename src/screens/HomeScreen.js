@@ -5,7 +5,6 @@ import {fontFamilies} from "../constants/fonts";
 import {AuthContext} from "../context/AuthContext";
 import {firestore} from '../../firebaseconfig';
 import {useIsFocused} from "@react-navigation/native";
-import {doc} from 'firebase/firestore';
 import {collection,getDocs} from "firebase/firestore";
 import ViewNotesFlatList from "../components/ViewNotesFlatList";
 import * as progress from 'react-native-progress';
@@ -25,7 +24,7 @@ const HomeScreen = () =>{
         id: doc.id,
         ...doc.data()
       }));
-    const userNotesArray = notesArray.filter(notes=>notes.createdBy===userId);
+    const userNotesArray = notesArray.filter(notes=>notes.createdBy===userId && notes.isFinished==="incomplete");
     setSavedNotes(userNotesArray);
     setProgressLoading(false);
   } catch (error) {

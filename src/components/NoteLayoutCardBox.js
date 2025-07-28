@@ -5,6 +5,7 @@ import SetReminderClock from '../../assets/images/reminderclock.svg';
 import UpdateNoteType from '../../assets/images/changenotetypeicon.svg';
 import GiveLabelTag from '../../assets/images/labeltag.svg';
 import MarkFinishedIcon from '../../assets/images/markasfinishedcheck.svg';
+import UpdateNoteBottomSheet from '../../assets/images/updatenoteiconinbottomsheet.svg';
 import DeleteNoteTrash from '../../assets/images/deletenoteicon.svg';
 import RightArrow from '../../assets/images/rightarrowforupdatenotebottomsheet.svg';
 import {collection,doc,updateDoc,getDocs} from "firebase/firestore";
@@ -50,6 +51,7 @@ const NoteLayoutCardBox = props=>{
                             visibilityTime: 3000,
                           });
                           setDbIsFinished("finished");
+                          props.closeModal();
                         }).catch((error)=>{
                             Toast.show({
                             type:'error',
@@ -111,12 +113,12 @@ const NoteLayoutCardBox = props=>{
         </TouchableOpacity>
         <TouchableOpacity
         activeOpacity={1}>
-         <View style = {{flexDirection:'row',position:'relative',marginTop:25,marginLeft:25}}>
+         <View style = {{flexDirection:'row',position:'relative',marginTop:20,marginLeft:25}}>
          <UpdateNoteType width = {24} height = {24}/>
          <Text style= {{color:'#180E25',fontSize:16,fontFamily:fontFamilies.INTER.medium,marginLeft:10}}>{"Change Note Type"}</Text>
         <View style = {{flexDirection:'row',position:'absolute',right:0,justifyContent:'center',alignItems:'center',marginTop:1,marginEnd:5}}>
         <View>
-         <Text style = {{color:'#827D89',fontSize:12,fontFamily:fontFamilies.INTER.regular}}>{dbNoteType}</Text>   
+         <Text style = {{color:'#827D89',fontSize:12,fontFamily:fontFamilies.INTER.regular,marginTop:1}}>{dbNoteType}</Text>   
         </View>
         <RightArrow width={16} height={16}></RightArrow>    
         </View> 
@@ -124,7 +126,7 @@ const NoteLayoutCardBox = props=>{
         </TouchableOpacity>
         <TouchableOpacity
         activeOpacity={1}>
-        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:25}}>
+        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:20}}>
         <GiveLabelTag width={24} height = {24}/>
         <Text style= {{color:'#180E25',fontSize:16,fontFamily:fontFamilies.INTER.medium,marginLeft:10}}>{"Give Label"}</Text>
         <View style = {{flexDirection:'row',position:'absolute',right:0,marginTop:1,marginEnd:5}}>
@@ -144,6 +146,7 @@ const NoteLayoutCardBox = props=>{
                 isFinished:"finished",
                 updatedOn:timestamp
             });
+            props.updateTimeWhenFinished(timestamp);
             }else{
                 Toast.show({
                     type:'error',
@@ -154,17 +157,31 @@ const NoteLayoutCardBox = props=>{
                 }); 
             }
         }}>
-        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:25}}>
+        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:20}}>
         <MarkFinishedIcon width={24} height = {24}/>
         <Text style= {{color:'#180E25',fontSize:16,fontFamily:fontFamilies.INTER.medium,marginLeft:10}}>{"Mark as Finished"}</Text>
         </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+        activeOpacity={1}
+        onPress={()=>{
+            props.updateNoteMethod()
+            props.closeModal()
+        }}>
+        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:20}}>
+        <UpdateNoteBottomSheet width={24} height = {24}/>
+        <Text style= {{color:'#180E25',fontSize:16,fontFamily:fontFamilies.INTER.medium,marginLeft:10}}>{"Update Note"}</Text>  
+        </View>    
         </TouchableOpacity>
         <View style = {noteLayoutBoxStyle.underlineBelowColorBackgroundSelectionTwo}>
         </View>
         <TouchableOpacity
         activeOpacity={1}
-        onPress={props.deleteNoteMethod}>
-        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:25}}>
+        onPress={()=>{
+            props.deleteNoteMethod()
+            props.closeModal()
+        }}>
+        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:22}}>
         <DeleteNoteTrash width={24} height = {24}/>
         <Text style= {{color:'#CE3A54',fontSize:16,fontFamily:fontFamilies.INTER.medium,marginLeft:10}}>{"Delete Note"}</Text>
         </View>

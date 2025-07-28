@@ -73,7 +73,7 @@ const SettingsScreen = () =>{
     backHandelingForLogout
   );
   return () => backHandler.remove();
-  },[isFocused,user?.uid,logoutAlert]);
+  },[isFocused,user?.uid]);
 
     return(
 

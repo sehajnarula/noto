@@ -4,7 +4,7 @@ import {useIsFocused,useNavigation} from "@react-navigation/native";
 import {firestore} from "../../firebaseconfig";
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import Toast from "react-native-toast-message";
-import Arrow from '../../assets/images/arrowright.svg';
+//import Arrow from '../../assets/images/arrowright.svg';
 import HorizontalDotsToOpenBottomSheet from '../../assets/images/dotshorizontalfornoteupdate.svg';
 import BookMark from '../../assets/images/bookmarknote.svg';
 import SearchInNote from '../../assets/images/searchinupdatescreen.svg';
@@ -34,6 +34,7 @@ const UpdateNote = ({route})=>{
     const [noteLayoutBox,setNoteLayoutBox] = useState(false);
     const insets = useSafeAreaInsets();
     const [dbBgColor, setDbBgColor] = useState("");
+    const updateNoteTimestamp = new Date().toLocaleString();
 
     const notesBgColorList = [{bgColorSaved:'#FFFFFF'},{bgColorSaved:'#F7DEE3'},{bgColorSaved:'#EFE9F7'},{bgColorSaved:'#DAF6E4'},{bgColorSaved:'#FDEBAB'},{bgColorSaved:'#F7F6D4'},{bgColorSaved:'#EFEEF0'}];
 
@@ -61,8 +62,8 @@ const UpdateNote = ({route})=>{
       const savedTimeStamp = moment(timeStamp,'M/D/YYYY, h:mm:ss A'); //saveddbformat
       const isToday = getMoment.isSame(savedTimeStamp,'day'); //checking if the saved value is of present day or not
       const formatted = isToday
-      ? `Last edited on ${savedTimeStamp.format('h:mm A')}`
-      : `Last edited on ${savedTimeStamp.format('D MMMM YYYY, h:mm A')}`;
+      ?`Last edited on ${savedTimeStamp.format('h:mm A')}`
+      :`Last edited on ${savedTimeStamp.format('D MMMM YYYY, h:mm A')}`;
       return formatted;
     };
   
@@ -104,9 +105,10 @@ const UpdateNote = ({route})=>{
     backAction
   );
   return () => backHandler.remove();
-  },[isFocused,noteLayoutBox]);
+  },[isFocused]);
 
     const updateNote = async(updateNoteId,updatedData)=>{
+      setProgressLoading(true)
       try {
         const documentReference = doc(firestore,"notes",updateNoteId);
         await updateDoc(documentReference,updatedData).then(()=>{
@@ -118,6 +120,9 @@ const UpdateNote = ({route})=>{
                   visibilityTime: 3000,
                   });
                   setProgressLoading(false);
+                  setNoteTitle(noteTitle);
+                  setNoteContent(noteContent);
+                  setLastUpdateDate(updateNoteTimestamp);
                     }).catch((error)=>{
                         Toast.show({
                             type:'error',
@@ -195,6 +200,13 @@ const UpdateNote = ({route})=>{
       colorBgArray={notesBgColorList}
       openNoteId={getNoteId}
       deleteNoteMethod={() => deleteNote(getNoteId)}
+      updateNoteMethod = {() => updateNote(getNoteId,{
+            userDbNoteTitle:noteTitle,
+            userDbNoteContent:noteContent,
+            updatedOn:updateNoteTimestamp
+      }
+      )}
+      updateTimeWhenFinished = {setLastUpdateDate}
       closeModal={() => setNoteLayoutBox(false)}
       />
       </Modal>
@@ -234,8 +246,14 @@ const UpdateNote = ({route})=>{
           {lastEditedMomentDate(getLastUpdateDate)}
           </Text>
           <View style = {{flexDirection:'row',position:'absolute',right:0}}>
-          <SearchInNote width = {24} height={24} marginEnd={15} top = {10}/>  
-          <BookMark width = {24} height={24} marginEnd={15} top={10}/>
+          <TouchableOpacity
+          activeOpacity={1}>
+          <SearchInNote width = {24} height={24} marginEnd={15} top = {10}/> 
+          </TouchableOpacity> 
+          <TouchableOpacity
+          activeOpacity={1}>
+          <BookMark width = {24} height={24} marginEnd={15} top={10}/>  
+          </TouchableOpacity>
           <View style = {{width:48,height:48,top:0.8}}>
           <TouchableOpacity 
           style = {{backgroundColor:'#6A3EA1',padding:12,justifyContent:'center',alignItems:'center'}}

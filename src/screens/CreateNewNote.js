@@ -10,18 +10,21 @@ import Toast from "react-native-toast-message";
 import Arrow from '../../assets/images/arrowright.svg';
 import * as progress from 'react-native-progress';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
+import NoteBackgroundSelectInCreate from "../components/NoteBackgroundSelectInCreate";
 
 const CreateNewNote = ({route})=>{
 
     const{noteTypeImage,noteTypeText} = route.params;
     const [noteTitle,setNoteTitle] = useState("");
     const [noteContent,setNoteContent] = useState("");
+    const [bgColorOnScreenDb,setBgColorOnScreenDb] = useState("");
     const navigation = useNavigation();
     const {user} = useContext(AuthContext)
     const [userId,setUserId] = useState("");
     const isFocused = useIsFocused();
     const [loading,setProgressLoading] = useState(false);
     const insets = useSafeAreaInsets();
+    const notesBgColorList = [{bgColorSaved:'#FFFFFF'},{bgColorSaved:'#F7DEE3'},{bgColorSaved:'#EFE9F7'},{bgColorSaved:'#DAF6E4'},{bgColorSaved:'#FDEBAB'},{bgColorSaved:'#F7F6D4'},{bgColorSaved:'#EFEEF0'}];
 
    useEffect(()=>{
     if(isFocused && user.uid){
@@ -60,7 +63,7 @@ const CreateNewNote = ({route})=>{
   };
 
     return(
-      <SafeAreaView style = {{flex:1}}>
+      <SafeAreaView style = {{flex:1,backgroundColor:bgColorOnScreenDb}}>
         
         {loading && (
           <View style = {noteCreationStyle.progressLoaderOverlayBg}>
@@ -90,7 +93,18 @@ const CreateNewNote = ({route})=>{
            value={noteTitle}>
            </TextInput>
           </View>
-          </View>        
+          </View>
+
+          <Text style = {{fontSize:10,color:'#827D89',fontFamilies:fontFamilies.INTER.regular,marginTop:8,marginLeft:15}}>
+           {"SELECT BACKGROUND"}   
+          </Text>
+
+          <NoteBackgroundSelectInCreate
+          sendColors = {notesBgColorList}
+          isHorizontal = {true}
+          getSelectedColor = {setBgColorOnScreenDb}>
+          </NoteBackgroundSelectInCreate>
+
          <View style = {{marginTop:20,marginBottom:20}}>
           <TextInput style = {noteCreationStyle.noteContentTextInput}
            autoCapitalize="none"
@@ -129,7 +143,7 @@ const CreateNewNote = ({route})=>{
             }else{
               setProgressLoading(true);
               const timestamp = new Date().toLocaleString();
-              addNote(userId,noteTitle,noteContent,timestamp,noteTypeText,"#FFFFFF","incomplete");
+              addNote(userId,noteTitle,noteContent,timestamp,noteTypeText,bgColorOnScreenDb,"incomplete");
             }
           }}>
 

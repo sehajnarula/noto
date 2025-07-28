@@ -237,7 +237,8 @@ const Register = () =>{
                           position:'bottom',
                           visibilityTime: 3000,
                         })
-                      } 
+                      }
+                      console.log("registererror",error); 
                   });
                 }
 
