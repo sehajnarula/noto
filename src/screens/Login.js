@@ -1,55 +1,105 @@
-import React, { useState, useEffect, useContext } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TextInput,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-  BackHandler,
-  Pressable
-} from "react-native";
-
-import { fontFamilies } from "../constants/fonts";
+import React,{useState,useEffect,useContext} from "react";
+import {View,StyleSheet,Text,TextInput,SafeAreaView,TouchableOpacity,ScrollView,BackHandler,Pressable} from "react-native";
+import {fontFamilies} from "../constants/fonts";
 import Arrow from "../../assets/images/arrowright.svg";
 import SocialGoogle from "../../assets/images/signinwithgoogle.svg";
-import { useNavigation, useIsFocused } from "@react-navigation/native";
+import {useNavigation, useIsFocused} from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import * as progress from 'react-native-progress';
-import { auth } from '../../firebaseconfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import {auth} from '../../firebaseconfig';
+import {signInWithEmailAndPassword} from 'firebase/auth';
 import StoreInternalData from "../context/StoreInternalData";
-import { AuthContext } from "../context/AuthContext";
-import { closeApp } from "../constants/commonfunctions";
+import {AuthContext} from "../context/AuthContext";
+import {closeApp} from "../constants/commonfunctions";
+import {TranslateApi} from "../apicall/TranslateApi";
 
 const Login = () => {
 
-  const loginPrompt = "Let's Login";
-  const andNotesText = "And note your ideas";
-  const emailAddressHeaderText = "Email Address";
-  const passwordHeaderText = "Password";
-  const forgetPassword = "Forget Password";
-  const orText = "Or";
-  const loginButton = "Login";
-  const loginWithGoogle = "Login With Google";
-  const registerUserText = "Don't have any account? Register here";
+  const [loginPrompt,setLoginPrompt]= useState("Let's Login");
+  const [andNotesText,setAndNotesText]=useState("And note your ideas");
+  const [emailAddressHeaderText,setEmailAddressHeaderText]=useState("Email Address");
+  const [passwordHeaderText,setPasswordHeaderText]=useState("Password");
+  const [forgetPassword,setForgetPassword]=useState("Forget Password");
+  const [orText,setOrText]=useState("Or");
+  const [loginButton,setLoginButton]=useState("Login");
+  const [loginWithGoogle,setLoginWithGoogle]=useState("Login With Google");
+  const [registerUserText,setRegisterUserText]=useState("Don't have any account? Register here");
+  const [enterEmailPlaceHolder,setEnterEmailPlaceHolder]=useState("Example: johndoe@gmail.com");
+  const [enterPasswordPlaceHolder,setEnterPasswordPlaceHolder]=useState("Enter Password");
   const [loading,setProgressLoading] = useState(false);
   const [userEnteredEmailAddress, setEmailAddress] = useState("");
   const [userEnteredPassword, setPassword] = useState("");
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const { saveUserToken } = useContext(StoreInternalData);
+  const {saveUserToken,getUserLanguageInStorage,userLanguage} = useContext(StoreInternalData);
   const {user,setUser,googleSignInButtonPress} = useContext(AuthContext);
 
-  // Handle Android Back Button
+  const translateText = async(userSelectedLanguageInDevice)=>{
+    try {
+        const [
+          loginPromptTranslated,
+          andNotesTextTranslated,
+          emailAddressHeaderTextTranslated,
+          passwordHeaderTextTranslated,
+          forgetPasswordTranslated,
+          orTextTranslated,
+          loginButtonTranslated,
+          loginWithGoogleTranslated,
+          registerUserTextTranslated,
+          enterEmailPlaceHolderTranslated,
+          enterPasswordPlaceHolderTranslated
+        ] = await Promise.all([
+            TranslateApi("Let's Login","en",userSelectedLanguageInDevice),
+            TranslateApi("And note your ideas","en",userSelectedLanguageInDevice),
+            TranslateApi("Email Address","en",userSelectedLanguageInDevice),
+            TranslateApi("Password","en",userSelectedLanguageInDevice),
+            TranslateApi("Forget Password","en",userSelectedLanguageInDevice),
+            TranslateApi("Or","en",userSelectedLanguageInDevice),
+            TranslateApi("Login","en",userSelectedLanguageInDevice),
+            TranslateApi("Login With Google","en",userSelectedLanguageInDevice),
+            TranslateApi("Don't have any account? Register here","en",userSelectedLanguageInDevice),
+            TranslateApi("Example: johndoe@gmail.com","en",userSelectedLanguageInDevice),
+            TranslateApi("Enter Password","en",userSelectedLanguageInDevice)
+        ]);
+        setLoginPrompt(loginPromptTranslated);
+        setAndNotesText(andNotesTextTranslated);
+        setEmailAddressHeaderText(emailAddressHeaderTextTranslated);
+        setPasswordHeaderText(passwordHeaderTextTranslated);
+        setForgetPassword(forgetPasswordTranslated);
+        setOrText(orTextTranslated);
+        setLoginButton(loginButtonTranslated);
+        setLoginWithGoogle(loginWithGoogleTranslated);
+        setRegisterUserText(registerUserTextTranslated);
+        setEnterEmailPlaceHolder(enterEmailPlaceHolderTranslated);
+        setEnterPasswordPlaceHolder(enterPasswordPlaceHolderTranslated);
+    }catch (error) {
+      console.log("languagetranslationerror",error);
+    }
+  };
+
+  // Handle Android Back Button usinguseEffect
   useEffect(() => {
     let backHandlerCloseScreen;
+
+  const startLanguageTranslation = async () => {
+    try {
+      const userLang = await getUserLanguageInStorage();
+      if (userLang && userLang !== 'en') {
+        await translateText(userLang);
+      } else {
+        console.log("User language is English. Skipping translation.");
+      }
+    } catch (e) {
+      console.log("initLanguageTranslation error", e);
+    }
+  };
+
     if (isFocused) {
       backHandlerCloseScreen = BackHandler.addEventListener("hardwareBackPress", () => {
         closeApp();
         return true;
       });
+      startLanguageTranslation();
     }
     return () => {
       if (backHandlerCloseScreen) {
@@ -121,7 +171,7 @@ const Login = () => {
     )}
       
       <ScrollView contentContainerStyle={{ flexGrow: 1, marginTop: 20 }}>
-        <View style={{ flex: 1, padding: 4 }}>
+        <View style={{flex: 1,padding:4}}>
           <Text style={loginScreenLayout.loginScreenName}>{loginPrompt}</Text>
           <Text style={styles.subText}>{andNotesText}</Text>
 
@@ -130,28 +180,26 @@ const Login = () => {
             style={loginScreenLayout.emailAddressTextInput}
             autoCapitalize="none"
             autoCorrect={false}
-            placeholder="Example: johndoe@gmail.com"
+            placeholder={enterEmailPlaceHolder}
             placeholderTextColor={"#C8C5CB"}
             onChangeText={input => setEmailAddress(input)}
-            value={userEnteredEmailAddress}
-          />
+            value={userEnteredEmailAddress}/>
 
           <Text style={loginScreenLayout.passwordHeader}>{passwordHeaderText}</Text>
+          
           <TextInput
             style={loginScreenLayout.passwordTextInput}
             autoCapitalize="none"
             autoCorrect={false}
-            placeholder="Enter Password"
+            placeholder={enterPasswordPlaceHolder}
             placeholderTextColor={"#C8C5CB"}
             onChangeText={input => setPassword(input)}
             secureTextEntry={true}
-            value={userEnteredPassword}
-          />
+            value={userEnteredPassword}/>
 
           <Text
             style={loginScreenLayout.forgotPasswordText}
-            onPress={() => navigation.navigate("ForgetPasswordScreen")}
-          >
+            onPress={() => navigation.navigate("ForgetPasswordScreen")}>
             {forgetPassword}
           </Text>
 
@@ -185,8 +233,7 @@ const Login = () => {
 
           <Text
             style={styles.registerText}
-            onPress={() => navigation.navigate("RegisterScreen")}
-          >
+            onPress={() => navigation.navigate("RegisterScreen")}>
             {registerUserText}
           </Text>
         </View>
@@ -228,7 +275,6 @@ const styles = StyleSheet.create({
 });
 
 const loginScreenLayout = StyleSheet.create({
-
   loginScreenName: {
     fontSize: 32,
     color: '#180E25',

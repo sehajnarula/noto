@@ -28,6 +28,7 @@ const UpdateNote = ({route})=>{
     const navigation = useNavigation();
     const{noteTypeText,getNoteTitle,getNoteContent,getNoteId} = route.params;
     const [noteTitle,setNoteTitle] = useState("");
+    const [getNoteType,setNoteType] = useState("");
     const [noteContent,setNoteContent] = useState("");
     const [getLastUpdateDate,setLastUpdateDate] = useState("");
     const [loading,setProgressLoading] = useState(false);
@@ -207,6 +208,7 @@ const UpdateNote = ({route})=>{
       }
       )}
       updateTimeWhenFinished = {setLastUpdateDate}
+      updateBgColorInScreenDb = {setDbBgColor}
       closeModal={() => setNoteLayoutBox(false)}
       />
       </Modal>

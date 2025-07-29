@@ -7,6 +7,7 @@ export const StoreInternalDataProvider = ({children})=>{
 
     const [loginUser,setLoginUser] = useState("");
     const[savedUser,setSavedUser] = useState("");
+    const [userLanguage,setUserLanguage] = useState("en");
 
     const saveUserToken = async(userAccessToken)=>{
          try {
@@ -39,9 +40,36 @@ export const StoreInternalDataProvider = ({children})=>{
         }
     };
 
+    const setUserLanguageInStorage = async(languageCode)=>{
+        try {
+          await AsyncStorage.setItem("userselectedlanguage",languageCode);
+          setUserLanguage(languageCode);
+        } catch (error) {
+          console.log("getlanguageerror",JSON.stringify(error));
+        }
+    };
+
+
+const getUserLanguageInStorage = async () => {
+  try {
+    const lang = await AsyncStorage.getItem("userselectedlanguage");
+    if (lang !== null) {
+      setUserLanguage(lang);
+      return lang;
+    } else {
+      await AsyncStorage.setItem("userselectedlanguage", "en");
+      setUserLanguage("en");
+      return "en";
+    }
+  } catch (error) {
+    console.log("getlanguageerror", JSON.stringify(error));
+    return "en";
+  }
+ };
+
     return(
 
-      <StoreInternalData.Provider value={{data:savedUser,loginUser,saveUserToken,removeUserToken,getUserToken}}>
+      <StoreInternalData.Provider value={{data:savedUser,loginUser,saveUserToken,removeUserToken,getUserToken,setUserLanguageInStorage,getUserLanguageInStorage,userLanguage}}>
         {children}
       </StoreInternalData.Provider>
 

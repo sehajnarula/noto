@@ -75,6 +75,7 @@ const SelectNotesColorBackground = props => {
             updateNoteBgColorInDb(props.sendingNoteId,{
             dbBackgroundColor:item.bgColorSaved
             });
+            props.updateBgColorFromFl(item.bgColorSaved);
           }}>
             <SelectNotesColorBackgroundLayout
               sendNoteBgColor={item}

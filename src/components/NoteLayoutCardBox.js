@@ -90,7 +90,8 @@ const NoteLayoutCardBox = props=>{
         <SelectNotesColorBackground
         colorArray = {props.colorBgArray}
         sendingNoteId = {props.openNoteId}
-        isHorizontal = {true}>
+        isHorizontal = {true}
+        updateBgColorFromFl = {props.updateBgColorInScreenDb}>
         </SelectNotesColorBackground>
 
         <View style = {noteLayoutBoxStyle.underlineBelowColorBackgroundSelection}> 

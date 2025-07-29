@@ -7,6 +7,7 @@ import ChangePasswordIcon from "../../assets/images/changepasswordicon.svg";
 import ChangePasswordArrow from "../../assets/images/changepasswordarrow.svg";
 import TextSizeIcon from "../../assets/images/textsizeicon.svg";
 import NotificationsIcon from "../../assets/images/notificationsbell.svg"
+import ChangeLanguageTranslation from "../../assets/images/selecttranslationlanguage.svg"
 import LogoutIcon from "../../assets/images/logouticon.svg"
 import {useNavigation,useIsFocused} from "@react-navigation/native";
 import StoreInternalData from "../context/StoreInternalData";
@@ -15,6 +16,8 @@ import {firestore} from '../../firebaseconfig';
 import {collection,getDocs} from "firebase/firestore";
 import * as progress from 'react-native-progress';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Modal from "react-native-modal";
+import SelectLanguageBottomSheet from "../components/SelectLanguageBottomSheet";
 
 const SettingsScreen = () =>{
 
@@ -28,6 +31,20 @@ const SettingsScreen = () =>{
     const [loading,setProgressLoading] = useState(false);
     const insets = useSafeAreaInsets();
     const [loginToken,setLoginToken] = useState("");
+    const [showLanguages,setShowLanguages] = useState(false);
+
+    const sendLanguages = [{
+      displayLanguageName:'English',
+      languageCode:'en'
+    },
+    {
+    displayLanguageName:'हिंदी',
+    languageCode:'hi'
+    },
+    {
+    displayLanguageName:'ਪੰਜਾਬੀ',
+    languageCode:'pa'
+    }];
 
     const userLogout = ()=>{
       setLogoutAlertStatus(false);
@@ -89,6 +106,22 @@ const SettingsScreen = () =>{
           </View>
         </View>
       )}
+
+      <Modal
+      isVisible={showLanguages}
+      onBackdropPress={() => setShowLanguages(false)}
+      animationIn="slideInUp"
+      animationOut="slideOutDown"
+      backdropTransitionOutTiming={0}
+      useNativeDriver
+      hideModalContentWhileAnimating
+      style={{margin: 0,justifyContent:'flex-end' }}
+      >
+      <SelectLanguageBottomSheet
+      closeModal={() => setShowLanguages(false)}
+      isHorizontal={false}
+      sendLanguagesInLayout={sendLanguages}/>
+      </Modal>
 
       {logoutAlert && (
         <View style = {settingsLayoutStyle.logoutOverlayBg}>
@@ -176,6 +209,17 @@ const SettingsScreen = () =>{
          <View style = {{flexDirection:'row',marginTop:20,marginLeft:25,position:'relative'}}>
           <ChangePasswordIcon width = {24} height = {24}></ChangePasswordIcon>
           <Text style = {{color:'#180E25',fontSize:16,marginLeft:10,marginTop:1}}>{"Change Password"}</Text>
+          <View style = {{flexDirection:'row',justifyContent:'center',right:0,position:'absolute'}}>
+          <ChangePasswordArrow width = {16} height = {16} marginTop = {4} marginEnd = {7}></ChangePasswordArrow>
+          </View>
+         </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+        activeOpacity={1}
+        onPress={()=>setShowLanguages(true)}>
+         <View style = {{flexDirection:'row',marginTop:25,marginLeft:25,position:'relative'}}>
+          <ChangeLanguageTranslation width = {24} height = {24}></ChangeLanguageTranslation>
+          <Text style = {{color:'#180E25',fontSize:16,marginLeft:10,marginTop:1}}>{"Change Language"}</Text>
           <View style = {{flexDirection:'row',justifyContent:'center',right:0,position:'absolute'}}>
           <ChangePasswordArrow width = {16} height = {16} marginTop = {4} marginEnd = {7}></ChangePasswordArrow>
           </View>
