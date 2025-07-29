@@ -19,7 +19,7 @@ const Login = () => {
   const [andNotesText,setAndNotesText]=useState("And note your ideas");
   const [emailAddressHeaderText,setEmailAddressHeaderText]=useState("Email Address");
   const [passwordHeaderText,setPasswordHeaderText]=useState("Password");
-  const [forgetPassword,setForgetPassword]=useState("Forget Password");
+  const [forgetPassword,setForgetPassword]=useState("Forgot Password");
   const [orText,setOrText]=useState("Or");
   const [loginButton,setLoginButton]=useState("Login");
   const [loginWithGoogle,setLoginWithGoogle]=useState("Login With Google");
@@ -35,6 +35,7 @@ const Login = () => {
   const {user,setUser,googleSignInButtonPress} = useContext(AuthContext);
 
   const translateText = async(userSelectedLanguageInDevice)=>{
+     setProgressLoading(true); 
     try {
         const [
           loginPromptTranslated,
@@ -72,8 +73,10 @@ const Login = () => {
         setRegisterUserText(registerUserTextTranslated);
         setEnterEmailPlaceHolder(enterEmailPlaceHolderTranslated);
         setEnterPasswordPlaceHolder(enterPasswordPlaceHolderTranslated);
-    }catch (error) {
-      console.log("languagetranslationerror",error);
+        setProgressLoading(false);
+      }catch (error) {
+        setProgressLoading(false);  
+        console.log("languagetranslationerror",error);
     }
   };
 
