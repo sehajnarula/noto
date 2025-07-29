@@ -20,9 +20,10 @@ const SelectLanguageBottomSheet = props=>{
     })();
     },[]);
 
-    const onSelectingLanguage = async(languageCode)=>{
+    const onSelectingLanguage = async(languageCode,languageName)=>{
     await setUserLanguageInStorage(languageCode);
     setSelectedLanguage(languageCode);
+    props.updateLanguageLocally(languageName);
     };
 
     return(

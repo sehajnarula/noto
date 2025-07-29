@@ -23,9 +23,10 @@ const SettingsScreen = () =>{
 
     const [userName,setUserName] = useState("");
     const [userEmail,setUserEmail] = useState("");
+    const [selectedLanguageText,setSelectedLanguageText] = useState("");
     const navigation = useNavigation();
     const isFocused = useIsFocused();
-    const {savedUser,loginUser,getUserToken,removeUserToken} = useContext(StoreInternalData);
+    const {savedUser,loginUser,getUserToken,removeUserToken,getUserLanguageInStorage} = useContext(StoreInternalData);
     const {user,logout} = useContext(AuthContext);
     const [logoutAlert,setLogoutAlertStatus] = useState(false);
     const [loading,setProgressLoading] = useState(false);
@@ -45,6 +46,16 @@ const SettingsScreen = () =>{
     displayLanguageName:'ਪੰਜਾਬੀ',
     languageCode:'pa'
     }];
+
+    const setSelectedLanguageOnScreen = async()=>{
+      const userLanguageInStorage = await getUserLanguageInStorage();
+      if(userLanguageInStorage!==""){
+        const putLanguage = sendLanguages.find(languages=>languages.languageCode===userLanguageInStorage)
+        if(putLanguage){
+          setSelectedLanguageText(putLanguage.displayLanguageName);
+        }
+      }
+    };
 
     const userLogout = ()=>{
       setLogoutAlertStatus(false);
@@ -77,6 +88,7 @@ const SettingsScreen = () =>{
       setLoginToken(savedUser);
       setUserEmail(user?.email);
       fetchAllUsersFromDb(user?.uid);
+      setSelectedLanguageOnScreen();
     }
     const backHandelingForLogout = () =>{
         if(logoutAlert){
@@ -120,7 +132,8 @@ const SettingsScreen = () =>{
       <SelectLanguageBottomSheet
       closeModal={() => setShowLanguages(false)}
       isHorizontal={false}
-      sendLanguagesInLayout={sendLanguages}/>
+      sendLanguagesInLayout={sendLanguages}
+      updateLanguageLocally = {setSelectedLanguageText}/>
       </Modal>
 
       {logoutAlert && (
@@ -221,6 +234,11 @@ const SettingsScreen = () =>{
           <ChangeLanguageTranslation width = {24} height = {24}></ChangeLanguageTranslation>
           <Text style = {{color:'#180E25',fontSize:16,marginLeft:10,marginTop:1}}>{"Change Language"}</Text>
           <View style = {{flexDirection:'row',justifyContent:'center',right:0,position:'absolute'}}>
+          <View style = {{marginEnd:5,marginTop:3.5}}>
+          <Text style = {{fontFamily:fontFamilies.INTER.regular,fontSize:12,color:'#827D89'}}>
+          {selectedLanguageText}
+          </Text>  
+          </View>
           <ChangePasswordArrow width = {16} height = {16} marginTop = {4} marginEnd = {7}></ChangePasswordArrow>
           </View>
          </View>
