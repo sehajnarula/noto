@@ -10,6 +10,7 @@ import Tabs from '../Tabs';
 import OnBoardingNew from '../../screens/OnBoardingNew';
 import CreateNewNote from '../../screens/CreateNewNote';
 import UpdateNote from '../../screens/UpdateNote';
+import CameraViewScreen from '../../screens/CameraViewScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,7 +27,8 @@ const MainStack = ()=>{
      <Stack.Screen name="EditProfileScreen" component={EditProfile}/>    
      <Stack.Screen name="FinishedScreen" component={FinishedScreen}/>
      <Stack.Screen name="CreateNewNoteScreen" component={CreateNewNote}/>    
-     <Stack.Screen name="UpdateNoteScreen" component={UpdateNote}/>    
+     <Stack.Screen name="UpdateNoteScreen" component={UpdateNote}/>
+     <Stack.Screen name="ShowCamera" component={CameraViewScreen}/>   
      </Stack.Navigator>
   );
 };

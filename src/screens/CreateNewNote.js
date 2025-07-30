@@ -1,5 +1,5 @@
 import React,{useState,useEffect,useContext} from "react";
-import {View,StyleSheet,SafeAreaView,TextInput,Text,Image,ScrollView, TouchableOpacity} from "react-native";
+import {View,StyleSheet,SafeAreaView,TextInput,Text,ScrollView,TouchableOpacity} from "react-native";
 import {useIsFocused,useNavigation} from "@react-navigation/native";
 import {AuthContext} from "../context/AuthContext";
 import {firestore} from "../../firebaseconfig";
@@ -10,6 +10,7 @@ import Toast from "react-native-toast-message";
 import Arrow from '../../assets/images/arrowright.svg';
 import * as progress from 'react-native-progress';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
+import MlCameraIcon from "../../assets/images/camera.svg"
 import NoteBackgroundSelectInCreate from "../components/NoteBackgroundSelectInCreate";
 
 const CreateNewNote = ({route})=>{
@@ -80,8 +81,10 @@ const CreateNewNote = ({route})=>{
          <View style = {{flex:1,padding:4}}>
 
           <View style = {{flexDirection:'row',alignItems:'center',position:'relative',marginTop:15,marginBottom:10,marginLeft:5}}>
-          <View style = {{alignItems:'center',flexDirection:'row',marginHorizontal:3}}>
-          <FontAwesomeIcon icon={noteTypeImage} size = {32} color="gold"></FontAwesomeIcon>
+            <View style={{ position: 'absolute', left: 10, top: 20 }}>
+            <FontAwesomeIcon icon={noteTypeImage} size={24} color="gold" />
+            </View>
+          <View style = {{alignItems:'center',flexDirection:'row',marginHorizontal:20}}>
           <TextInput
            autoCapitalize="none"
            autoCorrect={false}
@@ -92,6 +95,12 @@ const CreateNewNote = ({route})=>{
            onChangeText={(value)=>setNoteTitle(value)}
            value={noteTitle}>
            </TextInput>
+          </View>
+          <View style = {{position:'absolute',right:10,top:20.5}}>
+           <TouchableOpacity
+           activeOpacity={1}>
+            <MlCameraIcon width = {24} height = {24}/> 
+           </TouchableOpacity>
           </View>
           </View>
 
@@ -170,6 +179,7 @@ const noteCreationStyle = StyleSheet.create({
       marginHorizontal:20,
       fontFamily:fontFamilies.INTER.bold,
       color: '#000000',
+      paddingRight:40
     },
 
     progressLoaderOverlayBg:{
