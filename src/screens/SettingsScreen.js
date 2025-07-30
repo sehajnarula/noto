@@ -18,6 +18,7 @@ import * as progress from 'react-native-progress';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Modal from "react-native-modal";
 import SelectLanguageBottomSheet from "../components/SelectLanguageBottomSheet";
+import LanguageChangedSuccessfullyAnimation from "../components/LanguageChangedSuccessfullyAnimation";
 
 const SettingsScreen = () =>{
 
@@ -33,10 +34,12 @@ const SettingsScreen = () =>{
     const insets = useSafeAreaInsets();
     const [loginToken,setLoginToken] = useState("");
     const [showLanguages,setShowLanguages] = useState(false);
-
+    const [languageChangedInComponent, setLanguageChangedInComponent] = useState(false);
+    const [showLanguageChangedAnimation, setShowLanguageChangedAnimation] = useState(false);
+    
     const sendLanguages = [{
-      displayLanguageName:'English',
-      languageCode:'en'
+    displayLanguageName:'English',
+    languageCode:'en'
     },
     {
     displayLanguageName:'हिंदी',
@@ -64,7 +67,8 @@ const SettingsScreen = () =>{
     }
 
     const fetchAllUsersFromDb = async(userIdMethod) =>{
-            try {
+      //setProgressLoading(true);      
+      try {
               const userSnapshot = await getDocs(collection(firestore,"users"));
               const usersArray = userSnapshot.docs.map(doc => ({
               id: doc.id,
@@ -73,40 +77,68 @@ const SettingsScreen = () =>{
               const getUser = usersArray.find(users=>users.id===userIdMethod);  
             if(getUser){
                 setUserName(getUser.fullName);
-                setProgressLoading(false);
+                //setProgressLoading(false);
                 } 
               } catch (error) {
-                    setProgressLoading(false);
+                    //setProgressLoading(false);
                     console.log("userdbfetcherror",error)
                   }
             };
 
-    useEffect(()=>{
-      if(isFocused && user?.uid){
-      setProgressLoading(true);
+    useEffect(() => {
+      let timer;
+      if (isFocused && user?.uid) {
       getUserToken();
       setLoginToken(savedUser);
       setUserEmail(user?.email);
       fetchAllUsersFromDb(user?.uid);
       setSelectedLanguageOnScreen();
+      }
+      if (!showLanguages && languageChangedInComponent) {
+        timer = setTimeout(() => {
+        setShowLanguageChangedAnimation(true);
+        setLanguageChangedInComponent(false);
+        }, 500);
+      } // showing animation after modal
+
+      const backHandelingForLogout = () => {
+      if (logoutAlert) {
+      setLogoutAlertStatus(false);
+      return true;
     }
-    const backHandelingForLogout = () =>{
-        if(logoutAlert){
-          setLogoutAlertStatus(false);
-          return true;
-        }
-        return false;
-      };
+    return false;
+  };
+
     const backHandler = BackHandler.addEventListener(
     'hardwareBackPress',
-    backHandelingForLogout
-  );
-  return () => backHandler.remove();
-  },[isFocused,user?.uid]);
+     backHandelingForLogout
+    );
+
+    return () => {
+      backHandler.remove();
+      if (timer) clearTimeout(timer);
+    };
+    },[isFocused, user?.uid,languageChangedInComponent]);
+
 
     return(
 
       <SafeAreaView style = {{flex:1}}>
+
+      {showLanguageChangedAnimation && (
+        <Modal
+          isVisible={true}
+          onBackdropPress={() => setShowLanguageChangedAnimation(false)}
+          animationIn="slideInUp"
+          animationOut="slideOutDown"
+          backdropTransitionOutTiming={0}
+          useNativeDriver
+          hideModalContentWhileAnimating
+          style={{margin: 0, justifyContent: 'center'}}>
+          <LanguageChangedSuccessfullyAnimation
+          onCompletion={() => setShowLanguageChangedAnimation(false)}/>
+        </Modal>
+        )}  
 
       {loading && (
         <View style = {settingsLayoutStyle.progressLoaderOverlayBg}>
@@ -133,7 +165,9 @@ const SettingsScreen = () =>{
       closeModal={() => setShowLanguages(false)}
       isHorizontal={false}
       sendLanguagesInLayout={sendLanguages}
-      updateLanguageLocally = {setSelectedLanguageText}/>
+      updateLanguageLocally = {setSelectedLanguageText}
+      languageSelectedInChild = {setLanguageChangedInComponent}
+      />
       </Modal>
 
       {logoutAlert && (
@@ -278,9 +312,6 @@ const SettingsScreen = () =>{
          <View style = {{flexDirection:'row',marginTop:30,marginLeft:28,position:'relative'}}>
           <LogoutIcon width = {24} height = {24}></LogoutIcon>
           <Text style = {settingsLayoutStyle.logOutText}>{"Log Out"}</Text>
-          {/* <View style = {{flexDirection:'row',justifyContent:'center',right:0,position:'absolute'}}>
-          <ChangePasswordArrow width = {16} height = {16} marginTop = {4} marginEnd = {7}></ChangePasswordArrow>
-          </View> */}
          </View>
         </TouchableOpacity>    
 

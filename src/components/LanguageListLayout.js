@@ -17,7 +17,9 @@ const LanguageListLayout = props =>{
       <Switch
       value = {islanguageSelected}
       onValueChange={()=>{
-      props.onToggleChange(props.sendLanguageData.languageCode,props.sendLanguageData.displayLanguageName)}}
+      props.onToggleChange(props.sendLanguageData.languageCode,props.sendLanguageData.displayLanguageName)
+      }
+      }
       style = {{position:'absolute',right:0}}
       thumbColor={islanguageSelected?"#6A3EA1":"#D3D3D3"}
       trackColor={{ false:"#D3D3D3",true:"#EFE9F7"}}
