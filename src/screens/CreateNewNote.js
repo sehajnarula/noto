@@ -27,6 +27,10 @@ const CreateNewNote = ({route})=>{
     const insets = useSafeAreaInsets();
     const notesBgColorList = [{bgColorSaved:'#FFFFFF'},{bgColorSaved:'#F7DEE3'},{bgColorSaved:'#EFE9F7'},{bgColorSaved:'#DAF6E4'},{bgColorSaved:'#FDEBAB'},{bgColorSaved:'#F7F6D4'},{bgColorSaved:'#EFEEF0'}];
 
+    const checkPermissions = ()=>{
+
+    };
+
    useEffect(()=>{
     if(isFocused && user.uid){
       setUserId(user.uid);
