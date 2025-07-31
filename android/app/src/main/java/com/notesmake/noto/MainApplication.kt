@@ -1,4 +1,4 @@
-package com.noto
+package com.notesmake.noto
 
 import android.app.Application
 import com.facebook.react.PackageList

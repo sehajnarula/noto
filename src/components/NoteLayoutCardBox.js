@@ -74,7 +74,8 @@ const NoteLayoutCardBox = props=>{
 
     return(
 
-        <View style = {noteLayoutBoxStyle.bottomSheetBg}>
+        <View style = {noteLayoutBoxStyle.bottomSheetBg}
+        onPress = {()=>props.closeModal()}>
         
         <View style = {noteLayoutBoxStyle.bottomSheetContainerBg}>
         <TouchableOpacity

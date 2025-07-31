@@ -109,6 +109,7 @@ const UpdateNote = ({route})=>{
   },[isFocused]);
 
     const updateNote = async(updateNoteId,updatedData)=>{
+      const updateNoteTimestampTwo = new Date().toLocaleString();
       setProgressLoading(true)
       try {
         const documentReference = doc(firestore,"notes",updateNoteId);
@@ -123,7 +124,7 @@ const UpdateNote = ({route})=>{
                   setProgressLoading(false);
                   setNoteTitle(noteTitle);
                   setNoteContent(noteContent);
-                  setLastUpdateDate(updateNoteTimestamp);
+                  setLastUpdateDate(updateNoteTimestampTwo);
                     }).catch((error)=>{
                         Toast.show({
                             type:'error',
