@@ -34,19 +34,19 @@ const OnBoarding = () => {
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollX.value = event.contentOffset.x;
-      const index = Math.round(event.contentOffset.x / width);
+      const index = Math.round(event.contentOffset.x/width);
       runOnJS(setPage)(index);
     },
   });
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(()=>{
       const nextIndex = (currentPage + 1) % navigatePages.length;
       flatListReference.current?.scrollToIndex({
         index: nextIndex,
         animated: true,
       });
-    }, 3000);
+    },3000);
 
     return () => clearInterval(interval);
   }, [currentPage]);
@@ -74,8 +74,7 @@ const OnBoarding = () => {
           keyExtractor={(item) => item.text}
           onScroll={scrollHandler}
           renderItem={({ item }) => (
-            <View style={{ width,padding: 20 }}>
-              {/* {item.image} */}
+            <View style={{width,padding:20}}>
               <Text style={onBoardingStyleSheet.PagerText}>{item.text}</Text>
             </View>
           )}
@@ -102,8 +101,6 @@ const OnBoarding = () => {
 
       </View>
 
-        
-
       </View>
       <View style={{ flexDirection: "column", marginBottom: 15,justifyContent:'flex-end' }}>
           <TouchableOpacity
@@ -116,14 +113,10 @@ const OnBoarding = () => {
                   color: "#6A3EA1",
                   textAlign: "center",
                   fontSize: 16,
-                  //fontFamily: fontFamilies.INTER.medium,
-                }}
-              >
+                }}>
                 {letsgetstartedButton}
               </Text>
-              <PurpleArrow
-                style={{position:"absolute", right:0, marginTop:4}}
-              />
+              <PurpleArrow style={{position:"absolute", right:0, marginTop:4}}/>
             </View>
           </TouchableOpacity>
         </View>
@@ -135,7 +128,6 @@ const OnBoarding = () => {
 const onBoardingStyleSheet = StyleSheet.create({
   
   PagerText: {
-    //fontFamily: fontFamilies.INTER.bold,
     fontSize: 20,
     textAlign:'center',
     color: "#FFFFFF",
@@ -144,17 +136,13 @@ const onBoardingStyleSheet = StyleSheet.create({
   touchableOpacityViewStyle: {
     flexDirection: "row",
     justifyContent: "center",
-
   },
 
   letsgetstartedTouchableOpacity: {
     backgroundColor: "#FFFFFF",
     padding: 14,
     borderRadius: 30,
-    // justifyContent: "center
     marginHorizontal: 15,
-    // justifyContent:'flex-end'
-
   },
 
 });

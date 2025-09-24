@@ -1,5 +1,5 @@
 import React,{useState,useEffect,useContext} from "react";
-import {View,StyleSheet,SafeAreaView,TextInput,Text,ScrollView,TouchableOpacity} from "react-native";
+import {View,StyleSheet,SafeAreaView,TextInput,Text,ScrollView,TouchableOpacity,Platform} from "react-native";
 import {useIsFocused,useNavigation} from "@react-navigation/native";
 import {AuthContext} from "../context/AuthContext";
 import {firestore} from "../../firebaseconfig";
@@ -10,8 +10,9 @@ import Toast from "react-native-toast-message";
 import Arrow from '../../assets/images/arrowright.svg';
 import * as progress from 'react-native-progress';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
-import MlCameraIcon from "../../assets/images/camera.svg"
+import MlCameraIcon from "../../assets/images/camera.svg";
 import NoteBackgroundSelectInCreate from "../components/NoteBackgroundSelectInCreate";
+import {checkMultiple, requestMultiple, PERMISSIONS, RESULTS} from 'react-native-permissions';
 
 const CreateNewNote = ({route})=>{
 
@@ -27,8 +28,48 @@ const CreateNewNote = ({route})=>{
     const insets = useSafeAreaInsets();
     const notesBgColorList = [{bgColorSaved:'#FFFFFF'},{bgColorSaved:'#F7DEE3'},{bgColorSaved:'#EFE9F7'},{bgColorSaved:'#DAF6E4'},{bgColorSaved:'#FDEBAB'},{bgColorSaved:'#F7F6D4'},{bgColorSaved:'#EFEEF0'}];
 
-    const checkPermissions = ()=>{
+    const checkPermissionsAndNavigateToCamera = async()=>{
 
+ const isAndroid13OrAbove = Platform.Version >= 33;
+
+  const permissionsArray = isAndroid13OrAbove
+    ? [
+        PERMISSIONS.ANDROID.CAMERA,
+        PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
+        PERMISSIONS.ANDROID.READ_MEDIA_VIDEO,
+      ]
+    : [
+        PERMISSIONS.ANDROID.CAMERA,
+        PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+      ];
+
+    try {
+      const permissionsStatus = await checkMultiple(permissionsArray);
+      const allPermissionsGranted = Object.values(permissionsStatus).every(
+      (status) => status === RESULTS.GRANTED
+      );
+      if(allPermissionsGranted){
+         navigation.navigate("ShowCamera"); 
+      }else{
+      const requestedForPermission = await requestMultiple(permissionsArray);
+      const allRequestedPermissionsGranted = Object.values(requestedForPermission).every(
+        (status) => status === RESULTS.GRANTED
+      );
+        if(allRequestedPermissionsGranted){
+          navigation.navigate("ShowCamera");
+        }else{
+          Toast.show({
+            type:'error',
+            text1: 'Permission Not Granted',
+            autoHide: true,
+            position:'bottom',
+            visibilityTime: 3000,
+            });
+        }
+      }
+    }catch (error) {
+      console.log("getpermissionerror",error);
+    }
     };
 
    useEffect(()=>{
@@ -37,7 +78,7 @@ const CreateNewNote = ({route})=>{
     }
   },[isFocused]);
 
-  const addNote = async(saveUserId,userNoteTitle,userNoteContent,noteCreationDate,typeOfNote,noteBackgroundColor,isFinishedStatus)=>{
+  const addNote = async(saveUserId,userNoteTitle,userNoteContent,noteCreationDate,typeOfNote,noteBackgroundColor,isFinishedStatus,isBookMarkedStatus)=>{
     try {
       await addDoc(collection(firestore,"notes"),{
       createdBy:saveUserId,
@@ -47,7 +88,8 @@ const CreateNewNote = ({route})=>{
       updatedOn:noteCreationDate,
       noteType:typeOfNote,
       isFinished:isFinishedStatus,
-      dbBackgroundColor:noteBackgroundColor
+      dbBackgroundColor:noteBackgroundColor,
+      isBookmarked:isBookMarkedStatus
     });
     setNoteTitle("");
     setNoteContent("");
@@ -102,7 +144,8 @@ const CreateNewNote = ({route})=>{
           </View>
           <View style = {{position:'absolute',right:10,top:20.5}}>
            <TouchableOpacity
-           activeOpacity={1}>
+           activeOpacity={0.9}
+           onPress={()=>checkPermissionsAndNavigateToCamera()}>
             <MlCameraIcon width = {24} height = {24}/> 
            </TouchableOpacity>
           </View>
@@ -156,7 +199,7 @@ const CreateNewNote = ({route})=>{
             }else{
               setProgressLoading(true);
               const timestamp = new Date().toLocaleString();
-              addNote(userId,noteTitle,noteContent,timestamp,noteTypeText,bgColorOnScreenDb,"incomplete");
+              addNote(userId,noteTitle,noteContent,timestamp,noteTypeText,bgColorOnScreenDb,"incomplete",false);
             }
           }}>
 

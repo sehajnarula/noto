@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from "react";
-import {View,StyleSheet,FlatList,TouchableOpacity,Text} from "react-native";
+import {View,StyleSheet,FlatList,TouchableOpacity,Text,BackHandler} from "react-native";
 import CloseNoteLayoutDialog from '../../assets/images/closeiconcardbox.svg';
 import SetReminderClock from '../../assets/images/reminderclock.svg';
 import UpdateNoteType from '../../assets/images/changenotetypeicon.svg';
@@ -14,12 +14,54 @@ import {fontFamilies} from "../constants/fonts";
 import {useIsFocused} from "@react-navigation/native";
 import SelectNotesColorBackground from "./SelectNotesColorBackground";
 import Toast from "react-native-toast-message";
+import ShowNoteTypesInModal from "./ShowNoteTypesInModal";
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
+import{faLightbulb} from '@fortawesome/free-solid-svg-icons';
+import{faShoppingCart} from '@fortawesome/free-solid-svg-icons';
+import{faClipboard} from '@fortawesome/free-solid-svg-icons';
+import{faClipboardList} from '@fortawesome/free-solid-svg-icons';
+import{faMagic} from '@fortawesome/free-solid-svg-icons';
 
 const NoteLayoutCardBox = props=>{
 
     const [dbNoteType,setDbNoteType] = useState("");
     const [dbIsFinished,setDbIsFinished] = useState("");
+    const [showNoteTypeLayout,setShowNoteTypeLayout] = useState(false);
     const isFocused = useIsFocused();
+
+    const notesTypeArray = [
+            {   
+            noteType:'Interesting Idea',
+            },
+            {
+            noteType:'Buying Something',
+            },
+            {  
+            noteType:'Goals',
+            },
+            {    
+            noteType:'Guidance',
+            },
+            {
+            noteType:'Routine Tasks',
+        }];
+
+        const switchNoteIconInModal = (type) => {
+                switch (type) {
+                  case "Interesting Idea":
+                    return faLightbulb;
+                  case "Buying Something":
+                    return faShoppingCart;
+                  case "Goals":
+                    return faMagic;
+                  case "Guidance":
+                    return faClipboardList;
+                  case "Routine Tasks":
+                    return faClipboard;
+                  default:
+                    return null;
+                }
+            };
 
     const fetchNoteDbData = async(noteIdMethod) =>{
               try {
@@ -66,6 +108,32 @@ const NoteLayoutCardBox = props=>{
             }
           };
 
+        const updateNoteType = async(noteTypeUpdateId,noteTypeObject)=>{
+            try {
+                const documentReference = doc(firestore,"notes",noteTypeUpdateId);
+                await updateDoc(documentReference,noteTypeObject).then(()=>{
+                        Toast.show({
+                            type:'success',
+                            text1: 'Note Type Changed Success',
+                            autoHide: true,
+                            position:'bottom',
+                            visibilityTime: 3000,
+                        });
+                    setShowNoteTypeLayout(false);      
+                }).catch(()=>{
+                     Toast.show({
+                        type:'success',
+                        text1: 'Note Type Changed Success',
+                        autoHide: true,
+                        position:'bottom',
+                        visibilityTime: 3000,
+                        });   
+                });
+            } catch (error) {
+                console.log("changenotetypeerror",error);
+            }
+        };
+
      useEffect(()=>{
         if(isFocused && props.openNoteId){
            fetchNoteDbData(props.openNoteId);
@@ -74,8 +142,43 @@ const NoteLayoutCardBox = props=>{
 
     return(
 
-        <View style = {noteLayoutBoxStyle.bottomSheetBg}>
-        
+        <View style = {noteLayoutBoxStyle.bottomSheetBg}
+        onPress = {()=>props.closeModal()}>
+
+        {showNoteTypeLayout?(
+           <View style = {noteLayoutBoxStyle.bottomSheetContainerBg}>
+            <Text style = {{fontFamily:fontFamilies.INTER.bold,color:'#180E25',fontSize:16,textAlign:'center',alignItems:'center',marginTop:20}}>
+            {"Select Note Type From The List"}
+            </Text>  
+            <FlatList
+            isHorizontal = {false}
+            showsHorizontalScrollIndicator = {false}
+            showsVerticalScrollIndicator={false}
+            data={notesTypeArray}
+            keyExtractor={noteTypes=>noteTypes.noteType}
+            renderItem = {({item})=>(
+            <TouchableOpacity
+             activeOpacity={0.9}
+             onPress={()=>{
+               const timestamp = new Date().toLocaleString();
+               const setIconInModal = switchNoteIconInModal(item.noteType);
+               updateNoteType(props.openNoteId,{
+                noteType:item.noteType,
+                updatedOn:timestamp
+               });
+               setDbNoteType(item.noteType);
+               props.updateTimeWhenFinished(timestamp);
+               props.setNoteTypeLocally(item.noteType);
+               props.sendNoteIconUpdate(setIconInModal);
+             }}>
+            <ShowNoteTypesInModal
+            noteTypeText={item.noteType}>
+            </ShowNoteTypesInModal>
+            </TouchableOpacity>   
+            )}>        
+            </FlatList>
+           </View>  
+        ):(
         <View style = {noteLayoutBoxStyle.bottomSheetContainerBg}>
         <TouchableOpacity
         activeOpacity={1}
@@ -113,7 +216,8 @@ const NoteLayoutCardBox = props=>{
         </View>    
         </TouchableOpacity>
         <TouchableOpacity
-        activeOpacity={1}>
+        activeOpacity={1}
+        onPress={()=>setShowNoteTypeLayout(true)}>
          <View style = {{flexDirection:'row',position:'relative',marginTop:20,marginLeft:25}}>
          <UpdateNoteType width = {24} height = {24}/>
          <Text style= {{color:'#180E25',fontSize:16,fontFamily:fontFamilies.INTER.medium,marginLeft:10}}>{"Change Note Type"}</Text>
@@ -125,7 +229,7 @@ const NoteLayoutCardBox = props=>{
         </View> 
          </View>   
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
         activeOpacity={1}>
         <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:20}}>
         <GiveLabelTag width={24} height = {24}/>
@@ -137,7 +241,7 @@ const NoteLayoutCardBox = props=>{
         <RightArrow width={16} height={16}/>
         </View>
         </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
         activeOpacity={1}
         onPress={()=>{
@@ -182,12 +286,13 @@ const NoteLayoutCardBox = props=>{
             props.deleteNoteMethod()
             props.closeModal()
         }}>
-        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:22}}>
+        <View style = {{flexDirection:'row',position:'relative',marginLeft:25,marginTop:30}}>
         <DeleteNoteTrash width={24} height = {24}/>
         <Text style= {{color:'#CE3A54',fontSize:16,fontFamily:fontFamilies.INTER.medium,marginLeft:10}}>{"Delete Note"}</Text>
         </View>
         </TouchableOpacity>
-        </View>
+        </View>            
+        )}
         
         </View>
 

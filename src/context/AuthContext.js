@@ -14,20 +14,11 @@ export const AuthContext = createContext({
 
 export const AuthContextProvider = ({ children }) => {
   
+
   const [user, setUser] = useState(null);
   const [savedUsers,setSavedUsers] = useState([]);
 
   useEffect(() => {
-    // Configure Google Sign-In once when component mounts
-
-    GoogleSignin.configure({
-      //webClientId:"AIzaSyCFcJ6Vcre-hWiC97t3dfCzHQiZ5v-u_dg",
-      //webClientId:"1027840960807-7g2p74tg903vf71e7utgdlefndr8eges.apps.googleusercontent.com",
-      webClientId:"1027840960807-7g2p74tg903vf71e7utgdlefndr8eges.apps.googleusercontent.com",
-      offlineAccess:true,
-
-    });  
-
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
@@ -35,16 +26,15 @@ export const AuthContextProvider = ({ children }) => {
         setUser(null);
       }
     });
-
     return () => unsubscribe();
-  }, []);
+  },[]);
 
   const logout = async () => {
     try {
       await signOut(auth);
       setUser(null);
     } catch (error) {
-      console.log("Logout error:", error);
+      console.log("Logout error:", JSON.stringify(error));
     }
   };
 
@@ -80,15 +70,18 @@ export const AuthContextProvider = ({ children }) => {
 
 const googleSignInButtonPress = async () => {
   try {
-    
+    GoogleSignin.configure({
+      webClientId:"835626221376-vmh5mvk2fcb8spnpb63qiptsm9l6mpbg.apps.googleusercontent.com",
+      offlineAccess:true,
+    });
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-
     const userGet = await GoogleSignin.signIn();
+    let idToken = userGet.idToken;
 
-    const googleCredential = GoogleAuthProvider.credential(userGet);
+    if (!idToken) throw new Error("Google ID Token not found");
 
+    const googleCredential = GoogleAuthProvider.credential(idToken);
     const userCredential = await signInWithCredential(auth, googleCredential);
-
     const userGmail = userCredential.user;
 
     const userSnapshot = await getDocs(collection(firestore, "users"));
@@ -113,11 +106,10 @@ const googleSignInButtonPress = async () => {
     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
       console.log("Play Services Not available");
     } else {
-      console.log("Other Error", JSON.stringify(error));
+      console.log("Other Error", error);
     }
   }
 };
-
 
   return (
     <AuthContext.Provider value={{ user, setUser, logout, googleSignInButtonPress }}>

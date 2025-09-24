@@ -1,10 +1,14 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import {View,StyleSheet,Text,TextInput,Image,SafeAreaView,TouchableOpacity,ScrollView} from "react-native";
 import {fontFamilies} from "../constants/fonts";
-import {auth} from '../../firebaseconfig';
 import * as progress from 'react-native-progress';
 import Toast from "react-native-toast-message";
+import {useNavigation} from "@react-navigation/native";
+import {useIsFocused} from "@react-navigation/native";
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ForgetPasswordResetMailApi} from "../apicall/ForgetPasswordResetMailApi";
+import {auth,firestore} from '../../firebaseconfig';
+import {collection,getDocs,doc} from "firebase/firestore";
 
 const ForgetPassword = () =>{
 
@@ -13,9 +17,32 @@ const ForgetPassword = () =>{
     const enterEmailPrompt = "Insert your email address to receive a code for creating a new password";
     const emailAddressHeaderText = "Email Address";
     const [userEnteredEmailAddress,setEmailAddress] = useState("");
+    const [userName,setUserName] = useState("");
     const [loading,setProgressLoading] = useState(false);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const insets = useSafeAreaInsets();
+    const navigation = useNavigation();
+    const isFocused = useIsFocused();
+    const [savedUsers,setSavedDbUsers] = useState([]);
+
+     const fetchAllUsersFromDb = async() =>{
+          try {
+              const userSnapshot = await getDocs(collection(firestore,"users"));
+              const usersArray = userSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            }));
+            setSavedDbUsers(usersArray)      
+              } catch (error) {
+                console.log("userdbfetcherror",error)
+              }
+      };
+
+      useEffect(()=>{
+        if(isFocused){
+          fetchAllUsersFromDb();
+        }
+      },[isFocused])
 
     return(
 
@@ -70,6 +97,7 @@ const ForgetPassword = () =>{
             <TouchableOpacity
               activeOpacity={0.9}
               onPress={()=>{
+                const userFound = savedUsers.some(user=> user.emailAddress===userEnteredEmailAddress);
                 if(userEnteredEmailAddress===""){
                     Toast.show({
                     type:'error',
@@ -85,9 +113,22 @@ const ForgetPassword = () =>{
                     autoHide: true,
                     position:'bottom',
                     visibilityTime: 3000,
+                    });   
+                }else if(!userFound){
+                  Toast.show({
+                    type:'error',
+                    text1: 'This email does not exist in app',
+                    autoHide: true,
+                    position:'bottom',
+                    visibilityTime: 3000,
                     });
-                }else{
-                    
+                }else{    
+                  const min = 1000;
+                  const max = 9999;
+                  const otpNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+                  const getUserName = savedUsers.find(user=>user.emailAddress===userEnteredEmailAddress)
+                  ForgetPasswordResetMailApi("sehajbir54@gmail.com",userEnteredEmailAddress,"TeamNoto",getUserName.fullName,"Otp For Changing Password",`Hello ${getUserName.fullName}, ${otpNumber} is your code to access the password changing process`);
+                  navigation.navigate("ForgetPasswordOtp",{userEmailTyped:userEnteredEmailAddress,verificationCode:otpNumber.toString(),sendUserName:getUserName.fullName});  
                 }
               }}
               style = {forgetPasswordStyleSheet.sendCodeTouchableOpacity}>

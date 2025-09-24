@@ -4,12 +4,12 @@ import {getFirestore} from 'firebase/firestore';
 import {GoogleSignin, type SignInResponse} from '@react-native-google-signin/google-signin';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAfieVTGmPgY3poc1A3u5vUOm2MrYXCmSw",
-  authDomain: "notonotesapp-5f8a6.firebaseapp.com",
-  projectId: "notonotesapp-5f8a6",
-  storageBucket: "notonotesapp-5f8a6.firebasestorage.app",
-  messagingSenderId: "1027840960807",
-  appId: "1:1027840960807:android:44eaf64ecf2803b2d2e102"
+  apiKey: "AIzaSyD-tqqO7ZQWnrFBYT9I__cy5Px7WwgVXaY",
+  authDomain: "noto-56a36.web.app",
+  projectId: "noto-56a36",
+  storageBucket: "noto-56a36.firebasestorage.app",
+  messagingSenderId: "835626221376",
+  appId: "1:835626221376:android:04a1389976b942ff68c4a5"
 };
 
 const app:FirebaseApp = initializeApp(firebaseConfig);

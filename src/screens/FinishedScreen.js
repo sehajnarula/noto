@@ -1,22 +1,25 @@
 import React,{useState,useEffect,useContext} from "react";
-import {View,StyleSheet,ScrollView,SafeAreaView,Text} from "react-native";
+import {View,StyleSheet,ScrollView,SafeAreaView,Text,BackHandler} from "react-native";
 import NoFinishedNotesIcon from "../../assets/images/nofinishednotesicon.svg";
 import {fontFamilies} from "../constants/fonts";
 import {firestore} from '../../firebaseconfig';
 import {collection,getDocs} from "firebase/firestore";
 import {useIsFocused} from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import {AuthContext} from "../context/AuthContext";
 import * as progress from 'react-native-progress';
 import ViewNotesFlatList from "../components/ViewNotesFlatList";
 
-const FinishedScreen = () =>{
+const FinishedScreen = ({route}) =>{
 
-    const finishedNotesMessage = "Once you create a note and finish it, it will be appeared on this screen. So, let’s start your journey!"
+    const finishedNotesMessage = "Once you create a note and finish it, it will appear on this screen. So, let’s start your journey!"
     const [finishedNotes,setFinishedNotes] = useState([]);
     const isFocused = useIsFocused(); 
     const [loading,setProgressLoading] = useState(false);
     const {user} = useContext(AuthContext);
-    
+    const navigation = useNavigation();
+    const checkNavigationFromSettings = route.params?.navigateFromSettings || false;
+
     const getFinishedNotes = async(userId)=>{
         try {
           const notesSnapshot = await getDocs(collection(firestore,"notes"));
@@ -35,12 +38,26 @@ const FinishedScreen = () =>{
         }
     };
 
-    useEffect(()=>{
-      if(user.uid && isFocused){
-        setProgressLoading(true);
-        getFinishedNotes(user.uid);
-      }
-    },[isFocused,user.uid]);
+  useEffect(() => {
+    if (user.uid && isFocused) {
+    setProgressLoading(true);
+    getFinishedNotes(user.uid);
+  }
+
+    if (checkNavigationFromSettings) {
+    const onBackPress = () => {
+      navigation.navigate("Settings");
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      onBackPress
+    );
+    return () => backHandler.remove();
+  }
+  }, [isFocused, user.uid]);
+
 
     return(
 

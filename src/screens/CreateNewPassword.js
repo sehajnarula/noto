@@ -2,8 +2,9 @@ import React,{useState} from "react";
 import {View,StyleSheet,Text,TextInput,Image,SafeAreaView,TouchableOpacity,ScrollView} from "react-native";
 import {fontFamilies} from "../constants/fonts";
 
-const CreateNewPassword = () =>{
+const CreateNewPassword = ({route}) =>{
 
+    const{sendEmailToChangePassword} = route.params;
     const createNewPasswordScreenText = "Create a New Password";
     const createPasswordButton = "Create Password";
     const createNewPasswordPrompt = "Your new password should be different from the previous password";

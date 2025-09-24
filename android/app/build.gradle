@@ -78,9 +78,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.noto"
+    namespace "com.notesmake.noto"
     defaultConfig {
-        applicationId "com.noto"
+        applicationId "com.notesmake.noto"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -130,6 +130,9 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging:24.0.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     implementation("com.facebook.fresco:animated-gif:2.5.0")
+    implementation ("com.google.mlkit:image-labeling:17.0.7")
     implementation("com.google.firebase:firebase-functions")
+    // implementation("com.mapbox.maps:android:10.19.0")
+    // implementation("com.mapbox.mapboxsdk:mapbox-sdk-turf:6.11.0")
 }
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
