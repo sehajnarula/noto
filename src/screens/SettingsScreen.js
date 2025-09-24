@@ -6,6 +6,7 @@ import EditProfileIcon from "../../assets/images/editprofilepencil.svg";
 import ChangePasswordIcon from "../../assets/images/changepasswordicon.svg";
 import ChangePasswordArrow from "../../assets/images/changepasswordarrow.svg";
 import TextSizeIcon from "../../assets/images/textsizeicon.svg";
+import FinishedIcon from '../../assets/images/bottomfinishedclipboard.svg';
 import NotificationsIcon from "../../assets/images/notificationsbell.svg"
 import ChangeLanguageTranslation from "../../assets/images/selecttranslationlanguage.svg"
 import LogoutIcon from "../../assets/images/logouticon.svg"
@@ -19,6 +20,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Modal from "react-native-modal";
 import SelectLanguageBottomSheet from "../components/SelectLanguageBottomSheet";
 import LanguageChangedSuccessfullyAnimation from "../components/LanguageChangedSuccessfullyAnimation";
+import PinnedIcon from"../../assets/images/bookmarked.svg";
 
 const SettingsScreen = () =>{
 
@@ -283,9 +285,6 @@ const SettingsScreen = () =>{
          <View style = {{flexDirection:'row',marginTop:30,marginLeft:25,position:'relative'}}>
           <TextSizeIcon width = {24} height = {24}></TextSizeIcon>
           <Text style = {{color:'#180E25',fontSize:16,marginLeft:10,marginTop:1}}>{"Text Size"}</Text>
-          {/* <View style = {{flexDirection:'row',justifyContent:'center',right:0,position:'absolute'}}>
-          <ChangePasswordArrow width = {16} height = {16} marginTop = {4} marginEnd = {7}></ChangePasswordArrow>
-          </View> */}
          </View>
         </TouchableOpacity>
 
@@ -294,22 +293,44 @@ const SettingsScreen = () =>{
          <View style = {{flexDirection:'row',marginTop:30,marginLeft:25,position:'relative'}}>
           <NotificationsIcon width = {24} height = {24}></NotificationsIcon>
           <Text style = {{color:'#180E25',fontSize:16,marginLeft:10,marginTop:1}}>{"Notifications"}</Text>
-          {/* <View style = {{flexDirection:'row',justifyContent:'center',right:0,position:'absolute'}}>
-          <ChangePasswordArrow width = {16} height = {16} marginTop = {4} marginEnd = {7}></ChangePasswordArrow>
-          </View> */}
          </View>
         </TouchableOpacity>
 
         <View style = {settingsLayoutStyle.underLineView}>
         </View>    
-
+        <Text style = {{color:'#827D89',fontSize:10,marginTop:15,marginLeft:20}}>
+         {"NOTES"} 
+        </Text>
+        <TouchableOpacity
+        activeOpacity={1}
+        onPress={()=>navigation.navigate("BookMarkedNotesScreen")}>
+        <View style = {{flexDirection:'row',position:'relative',marginTop:15,marginLeft:20}}>
+        <PinnedIcon width = {20} height = {20} marginTop = {1}/>
+        <Text style = {{color:'#180E25',fontSize:16,marginLeft:10}}>{"Pinned"}</Text>
+        <View style = {{flexDirection:'row',position:'absolute',right:0,justifyContent:'center'}}>
+        <ChangePasswordArrow width = {16} height = {16} marginTop = {3} marginEnd = {7}></ChangePasswordArrow>  
+        </View>
+        </View>  
+        </TouchableOpacity>
+        <TouchableOpacity
+        activeOpacity={1}
+        onPress={()=>navigation.navigate("Finished",{navigateFromSettings:true})}>
+        <View style = {{flexDirection:'row',position:'relative',marginTop:20,marginLeft:18}}>
+        <FinishedIcon width = {24} height = {24} marginTop = {1}/>
+        <Text style = {{color:'#180E25',fontSize:16,marginLeft:8,marginTop:2.5}}>{"Finished"}</Text>
+        <View style = {{flexDirection:'row',position:'absolute',right:0,justifyContent:'center'}}>
+        <ChangePasswordArrow width = {16} height = {16} marginTop = {3.5} marginEnd = {7}></ChangePasswordArrow>  
+        </View>
+        </View>
+        </TouchableOpacity>
+        <View style = {settingsLayoutStyle.underLineView}>
+        </View>
         <TouchableOpacity
         activeOpacity={1}
         onPress={()=>
         setLogoutAlertStatus(true)
-        }
-        >
-         <View style = {{flexDirection:'row',marginTop:30,marginLeft:28,position:'relative'}}>
+        }>
+         <View style = {{flexDirection:'row',marginTop:20,marginLeft:22,position:'relative'}}>
           <LogoutIcon width = {24} height = {24}></LogoutIcon>
           <Text style = {settingsLayoutStyle.logOutText}>{"Log Out"}</Text>
          </View>

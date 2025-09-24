@@ -5,62 +5,74 @@
  * @format
  */
 
-import { NewAppScreen } from '@react-native/new-app-screen';
-import { StatusBar, StyleSheet, useColorScheme, View } from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
-import Toast from 'react-native-toast-message';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useColorScheme } from 'react-native';
 import 'react-native-gesture-handler';
 import { Provider as PaperProvider } from 'react-native-paper';
-import Login from './src/screens/Login';
-import Register from './src/screens/Register';
-import ForgetPassword from './src/screens/ForgetPassword';
-import CreateNewPassword from './src/screens/CreateNewPassword';
-import OnBoarding from './src/screens/OnBoarding';
-import NewNote from './src/screens/NewNote';
-import OnBoardingNew from './src/screens/OnBoardingNew';
-import Tabs from './src/navigation/Tabs';
-import HomeScreen from './src/screens/HomeScreen';
-import SearchScreen from './src/screens/SearchScreen';
-import SettingsScreen from './src/screens/SettingsScreen';
-import ChangePassword from './src/screens/ChangePassword';
-import EditProfile from './src/screens/EditProfile';
-import SplashScreen from './src/screens/SplashScreen';
-import {StoreInternalDataProvider} from './src/context/StoreInternalData';
-import {AuthContextProvider} from './src/context/AuthContext';
-import Navigator from './src/navigation/Navigator';
+import Toast from 'react-native-toast-message';
+import { AuthContextProvider } from './src/context/AuthContext';
+import { StoreInternalDataProvider } from './src/context/StoreInternalData';
+import NetflixHorizontalTitles from './src/screens/NetflixHorizontalTitles';
+import SampleMapBoxScreen from './src/screens/SampleMapBoxScreen';
+import SearchLocationScreen from './src/screens/SearchLocationScreen';
+import SevenDaysWeatherScreen from './src/screens/SevenDaysWeatherScreen';
+import SpecificLocationWeather from './src/screens/SpecificLocationWeather';
+import TitleDetails from './src/screens/TitleDetails';
+import WeatherAppHomeScreen from './src/screens/WeatherAppHomeScreen';
+import WeatherSettings from './src/screens/WeatherSettings';
 
 const Stack = createNativeStackNavigator();
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
-  
 
-   return (
-  //   <View style={styles.container}>
-  //     <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-  //     <NewAppScreen templateFileName="App.tsx" />
-  //   </View>
-  
-<PaperProvider>
-  <AuthContextProvider>  
-  <StoreInternalDataProvider>
-  <NavigationContainer>
-  <Navigator/>
-  <Toast/>
-  </NavigationContainer>
-  </StoreInternalDataProvider>
-  </AuthContextProvider>
-</PaperProvider>
-
-);
-
+  return (
+    <PaperProvider>
+      <AuthContextProvider>
+        <StoreInternalDataProvider>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName="MapBoxScreen"
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen
+                name="WeatherHome"
+                component={WeatherAppHomeScreen}
+              />
+              <Stack.Screen
+                name="SevenDays"
+                component={SevenDaysWeatherScreen}
+              />
+              <Stack.Screen
+                name="SearchLocation"
+                component={SearchLocationScreen}
+              />
+              <Stack.Screen
+                name="WeatherSettingsScreen"
+                component={WeatherSettings}
+              />
+              <Stack.Screen
+                name="LocationWeatherDisplay"
+                component={SpecificLocationWeather}
+              />
+              <Stack.Screen
+                name="NetflixHome"
+                component={NetflixHorizontalTitles}
+              />
+              <Stack.Screen name="TitleDetails" component={TitleDetails} />
+              <Stack.Screen
+                name="MapBoxScreen"
+                component={SampleMapBoxScreen}
+              />
+            </Stack.Navigator>
+            {/* <Navigator/> */}
+            <Toast />
+          </NavigationContainer>
+        </StoreInternalDataProvider>
+      </AuthContextProvider>
+    </PaperProvider>
+  );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;

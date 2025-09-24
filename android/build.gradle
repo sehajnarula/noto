@@ -7,19 +7,41 @@ buildscript {
         ndkVersion = "27.1.12297006"
         kotlinVersion = "2.1.20"
         googlePlayServicesAuthVersion = "20.7.0"
+        mapbox_downloads_token = "sk.eyJ1Ijoic2VoYWpuYXJ1bGEtMTA4IiwiYSI6ImNtZmt5NDd2cDAyOXcyaXF2czBuNHJwamMifQ.2dx1AeFs9iUYni_pQyNkyg"
     }
+
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
-    dependencies {
+
+        dependencies {
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
         classpath("com.google.gms:google-services:4.4.0")
 
     }
+
+
+allprojects {
+    repositories {
+        maven {
+            url 'https://api.mapbox.com/downloads/v2/releases/maven'
+            authentication {
+                basic(BasicAuthentication)
+            }
+            credentials {
+                // Do not change the username below.
+                // This should always be `mapbox` (not your username).
+                username = 'mapbox'
+                // Use the secret token you stored in gradle.properties as the password
+                password = project.properties[mapbox_downloads_token] ?: ""
+            }
+        }
+    }
+}
+
 }
 
 apply plugin: "com.facebook.react.rootproject"

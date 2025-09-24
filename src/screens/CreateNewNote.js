@@ -78,7 +78,7 @@ const CreateNewNote = ({route})=>{
     }
   },[isFocused]);
 
-  const addNote = async(saveUserId,userNoteTitle,userNoteContent,noteCreationDate,typeOfNote,noteBackgroundColor,isFinishedStatus)=>{
+  const addNote = async(saveUserId,userNoteTitle,userNoteContent,noteCreationDate,typeOfNote,noteBackgroundColor,isFinishedStatus,isBookMarkedStatus)=>{
     try {
       await addDoc(collection(firestore,"notes"),{
       createdBy:saveUserId,
@@ -88,7 +88,8 @@ const CreateNewNote = ({route})=>{
       updatedOn:noteCreationDate,
       noteType:typeOfNote,
       isFinished:isFinishedStatus,
-      dbBackgroundColor:noteBackgroundColor
+      dbBackgroundColor:noteBackgroundColor,
+      isBookmarked:isBookMarkedStatus
     });
     setNoteTitle("");
     setNoteContent("");
@@ -198,7 +199,7 @@ const CreateNewNote = ({route})=>{
             }else{
               setProgressLoading(true);
               const timestamp = new Date().toLocaleString();
-              addNote(userId,noteTitle,noteContent,timestamp,noteTypeText,bgColorOnScreenDb,"incomplete");
+              addNote(userId,noteTitle,noteContent,timestamp,noteTypeText,bgColorOnScreenDb,"incomplete",false);
             }
           }}>
 

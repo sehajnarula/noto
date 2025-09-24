@@ -1,6 +1,7 @@
 import React,{useState,useEffect, useContext} from "react";
-import {View,StyleSheet,ScrollView,SafeAreaView,Text,TouchableOpacity,TextInput} from "react-native";
+import {View,StyleSheet,ScrollView,SafeAreaView,Text,TouchableOpacity,TextInput,Platform} from "react-native";
 import {fontFamilies} from "../constants/fonts";
+import {checkMultiple, requestMultiple, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import TickIcon from "../../assets/images/editprofiletick.svg";
 import {useIsFocused} from "@react-navigation/native";
 import StoreInternalData from "../context/StoreInternalData";
@@ -12,6 +13,7 @@ import ChangeImageIcon from "../../assets/images/editprofilepencil.svg";
 import Toast from "react-native-toast-message";
 import * as progress from 'react-native-progress';
 import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {launchImageLibrary} from "react-native-image-picker";
 
 const EditProfile = () =>{
 
@@ -43,6 +45,69 @@ const EditProfile = () =>{
                 console.log("userdbfetcherror",error)
               }
           };
+
+      const checkPermissionsAndNavigateToGallery = async()=>{
+         
+          const isAndroid13OrAbove = Platform.Version >= 33;
+         
+           const permissionsArray = isAndroid13OrAbove
+             ? [
+                 PERMISSIONS.ANDROID.CAMERA,
+                 PERMISSIONS.ANDROID.READ_MEDIA_IMAGES,
+                 PERMISSIONS.ANDROID.READ_MEDIA_VIDEO,
+               ]
+             : [
+                 PERMISSIONS.ANDROID.CAMERA,
+                 PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+               ];
+         
+             try {
+               const permissionsStatus = await checkMultiple(permissionsArray);
+               const allPermissionsGranted = Object.values(permissionsStatus).every(
+               (status) => status === RESULTS.GRANTED
+               );
+               if(allPermissionsGranted){
+                handlePickFromGallery();
+              }else{
+               const requestedForPermission = await requestMultiple(permissionsArray);
+               const allRequestedPermissionsGranted = Object.values(requestedForPermission).every(
+                 (status) => status === RESULTS.GRANTED
+               );
+                 if(allRequestedPermissionsGranted){
+                   handlePickFromGallery();
+                 }else{
+                   Toast.show({
+                     type:'error',
+                     text1: 'Permission Not Granted',
+                     autoHide: true,
+                     position:'bottom',
+                     visibilityTime: 3000,
+                     });
+                 }
+               }
+             }catch (error) {
+               console.log("getpermissionerror",error);
+             }
+             }; 
+
+  const handlePickFromGallery = async () => {
+    const options = {
+      mediaType: "photo",
+      selectionLimit: 1,
+    };
+    try {
+      const response = await launchImageLibrary(options);
+      console.log("gallery pick", response);
+      if (response.didCancel||!response.assets){ 
+        return
+      };
+      const photo = response.assets[0];
+      // see selected photo in response
+      console.log("Selected photo:", photo.uri);
+    } catch (error) {
+      console.log("Gallery pick error", error);
+    }
+  };    
 
     useEffect(()=>{
       if(isFocused){
@@ -115,6 +180,9 @@ const EditProfile = () =>{
 
           <TouchableOpacity
           activeOpacity={1}
+          onPress={()=>{
+            checkPermissionsAndNavigateToGallery();
+          }}
           style = {{borderWidth:1,borderRadius:30,borderColor:'#6A3EA1',padding:5,marginHorizontal:50,top:5}}>
            <View style = {{flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative'}}>
            <View style = {{position:'absolute',left:60}}>
@@ -202,7 +270,7 @@ const EditProfile = () =>{
               style = {editProfileLayout.createPasswordTouchableOpacity}>
               <View style = {editProfileLayout.touchableOpacityViewStyle}>
               <View style = {{position:'absolute',left:4}}>
-               <TickIcon width = {20} height = {20} marginTop = {2}></TickIcon> 
+               <TickIcon width={20} height={20} marginTop={2}></TickIcon> 
               </View>
               <Text
               style = {{flex:1,color:'#FFFFFF',textAlign:'center',fontSize:16}}>
